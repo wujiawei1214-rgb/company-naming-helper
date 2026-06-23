@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>公司字号起名助手 · 外贸注册专用</title>
+<style>
+  :root{
+    --bg:#0f1115; --card:#171a21; --card2:#1f232c; --line:#2a2f3a;
+    --txt:#e8eaed; --sub:#9aa3b2; --acc:#ff7a45; --acc2:#ffb088;
+    --gold:#e8b339; --ok:#3ecf8e; --shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Arial,sans-serif;
+    background:radial-gradient(120% 120% at 50% 0%,#1a1d26 0%,#0f1115 55%);
+    color:var(--txt);min-height:100vh;line-height:1.6;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:18px 16px 40px}
+  header{text-align:center;padding:14px 0 18px}
+  header h1{font-size:22px;margin:0 0 4px;letter-spacing:.5px}
+  header h1 span{color:var(--acc)}
+  header p{font-size:13px;color:var(--sub);margin:0}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
+  .field{margin-bottom:16px}
+  .field:last-child{margin-bottom:0}
+  label{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
+  label .opt{color:var(--sub);font-weight:400;font-size:12px}
+  input[type=text]{
+    width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);
+    background:var(--card2);color:var(--txt);font-size:15px;outline:none;transition:.2s;
+  }
+  input[type=text]:focus{border-color:var(--acc)}
+  input::placeholder{color:#5b6373}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{
+    padding:9px 14px;border-radius:20px;border:1px solid var(--line);background:var(--card2);
+    color:var(--sub);font-size:13.5px;cursor:pointer;transition:.18s;user-select:none;
+  }
+  .chip.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#1a1206;border-color:transparent;font-weight:600}
+  .btn{
+    width:100%;padding:15px;border:none;border-radius:14px;font-size:16px;font-weight:700;cursor:pointer;
+    background:linear-gradient(135deg,var(--acc),#ff9d6e);color:#1a1206;letter-spacing:1px;
+    box-shadow:0 6px 18px rgba(255,122,69,.35);transition:.15s;
+  }
+  .btn:active{transform:scale(.98)}
+  .btn.ghost{background:var(--card2);color:var(--txt);box-shadow:none;border:1px solid var(--line);font-weight:600;margin-top:10px}
+  .analysis{background:linear-gradient(135deg,#23202b,#1c2530);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:16px}
+  .analysis h3{margin:0 0 10px;font-size:15px;color:var(--gold)}
+  .analysis p{margin:0 0 8px;font-size:13.5px;color:#c7cdd9}
+  .analysis p:last-child{margin:0}
+  .analysis b{color:var(--acc2)}
+  .secTitle{font-size:14px;color:var(--sub);margin:18px 2px 10px;display:flex;align-items:center;gap:8px}
+  .secTitle::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--acc)}
+  .secTitle b{color:var(--txt)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .zCard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 12px 10px;position:relative;overflow:hidden}
+  .zCard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(var(--acc),var(--gold))}
+  .zCard .z{font-size:20px;font-weight:800;letter-spacing:1px;margin:0 0 3px}
+  .zCard .full{font-size:11px;color:var(--sub);margin:0 0 6px;line-height:1.4}
+  .zCard .mean{font-size:11.5px;color:#aeb6c4;margin:0 0 8px;min-height:30px;line-height:1.45}
+  .zCard .ops{display:flex;gap:6px;align-items:center}
+  .zCard .score{font-size:12px;font-weight:700;color:var(--gold);margin-left:auto}
+  .miniBtn{flex:0 0 auto;font-size:11px;border:1px solid var(--line);background:var(--card2);color:var(--sub);border-radius:8px;padding:5px 8px;cursor:pointer;text-decoration:none;display:inline-block}
+  .miniBtn:active{color:var(--acc)}
+  .miniBtn.chk{color:var(--ok);border-color:rgba(62,207,142,.4)}
+  .hidden{display:none}
+  .tipbar{font-size:12px;color:var(--sub);text-align:center;margin-top:6px}
+  .counter{font-size:12px;color:var(--sub);margin-left:auto;font-weight:400}
+  footer{text-align:center;font-size:11px;color:#5b6373;margin-top:20px;line-height:1.7}
+  .checkNote{background:var(--card2);border:1px dashed var(--line);border-radius:12px;padding:11px 13px;font-size:12px;color:var(--sub);margin-bottom:14px}
+  .checkNote a{color:var(--acc2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>公司<span>字号</span>起名助手</h1>
+    <p>填需求 · 一页 50 个字号 · 一键查重核名</p>
+  </header>
+
+  <!-- 输入区 -->
+  <div class="card" id="formCard">
+    <div class="field">
+      <label>① 主营行业 / 产品 <span class="opt">必填</span></label>
+      <input type="text" id="industry" placeholder="如:美甲胶、五金工具、户外用品…">
+    </div>
+    <div class="field">
+      <label>② 公司所在地 <span class="opt">用于查重定位,如「深圳市」</span></label>
+      <input type="text" id="region" placeholder="如:深圳市、义乌市、广州市…">
+    </div>
+    <div class="field">
+      <label>③ 主要目标市场</label>
+      <div class="chips" id="marketChips">
+        <span class="chip" data-v="欧美">欧美</span>
+        <span class="chip" data-v="中东">中东</span>
+        <span class="chip" data-v="东南亚">东南亚</span>
+        <span class="chip" data-v="南美">南美</span>
+        <span class="chip" data-v="非洲">非洲</span>
+        <span class="chip" data-v="全球">全球通用</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>④ 字号风格偏好 <span class="opt">可多选,不选默认大气+国际</span></label>
+      <div class="chips" id="styleChips">
+        <span class="chip" data-v="大气">大气稳重</span>
+        <span class="chip" data-v="国际">国际洋气</span>
+        <span class="chip" data-v="简洁">简洁好记</span>
+        <span class="chip" data-v="科技">科技创新</span>
+        <span class="chip" data-v="吉祥">吉祥寓意</span>
+        <span class="chip" data-v="自然">自然环保</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>⑤ 希望体现的关键词 <span class="opt">选填,如:姓氏「王」、品质…</span></label>
+      <input type="text" id="keyword" placeholder="如:王、瑞、品质…(优先出含此字的字号)">
+    </div>
+    <button class="btn" id="genBtn">✨ 生成 50 个字号</button>
+    <div class="tipbar">字号即公司名核心部分(行政区划+字号+行业+有限公司)</div>
+  </div>
+
+  <!-- 输出区 -->
+  <div id="result"></div>
+</div>
+
+<script>
+/* =====================================================================
+   核名 API 配置位 —— 升级到真实工商核名接口只需改这里
+   ---------------------------------------------------------------------
+   默认 mode:'jump' = 路线A,点查重跳转企查查/国家公示系统搜索(零成本/合规)
+   接真实 API 时改 mode:'api',填后端代理地址(需后端中转,勿把key放前端):
+     NAMECHECK_API = { mode:'api', endpoint:'https://your-backend/namecheck' }
+   后端约定:GET ?name=全称  ->  {available:true|false, sameCount:N}
+   ===================================================================== */
+const NAMECHECK_API = { mode:'jump' };
+
+/* ---------- 字号字库:前字 / 后字,按风格组合生成 ---------- */
+const BANK = {
+  大气:{ pre:["鸿","宏","泰","锦","盛","华","聚","拓","骏","环","巨","鼎","昊","恒","润","广","正","信","德","庆"],
+         suf:["运","图","盛","程","世","翔","鑫","远","丰","宇","力","峰","达","源","昌","通","瑞","博","业","泰"] },
+  国际:{ pre:["欧","纽","凯","瑞","迈","星","威","卓","领","美","环","博","世","锐","拓"],
+         suf:["驰","顿","瑞","拓","耀","越","创","通","域","宇","诺","航","洲","盛","睿"] },
+  简洁:{ pre:["优","简","益","好","一","乐","捷","顺","佳","享","百","易","新","真","知"],
+         suf:["品","一","佳","顺","诺","淘","达","易","购","赞","运","选","美","享","优"] },
+  科技:{ pre:["智","芯","数","极","创","量","睿","科","新","云","网","联","翼","启","维"],
+         suf:["创","动","联","客","核","擎","子","芯","诺","驰","讯","翼","谷","维","界"] },
+  吉祥:{ pre:["福","金","祥","聚","顺","瑞","旺","恒","隆","裕","益","鑫","吉","泰","昌"],
+         suf:["源","瑞","和","禾","昌","兴","丰","康","运","盛","缘","泰","福","禄","祥"] },
+  自然:{ pre:["青","绿","清","本","沐","和","碧","原","纯","木","澜","沁","翠","润","春"],
+         suf:["禾","源","川","然","林","风","野","扬","兮","溪","谷","叶","泽","川","森"] }
+};
+/* 单字寓意,用于组合解读 */
+const CHAR_MEAN = {
+  "鸿":"鸿运宏大","宏":"宏图大志","泰":"国泰安稳","锦":"前程似锦","盛":"兴盛繁荣","华":"中华精华","聚":"汇聚人气",
+  "拓":"开拓进取","骏":"骏马奔腾","环":"环球视野","巨":"实力雄厚","鼎":"一言九鼎","昊":"广阔无垠","恒":"持之以恒",
+  "润":"润泽万物","广":"广纳四方","正":"堂堂正正","信":"诚信为本","德":"厚德载物","庆":"喜庆吉祥",
+  "运":"鸿运亨通","图":"大展宏图","程":"锦绣前程","世":"通达世界","翔":"展翅高飞","鑫":"三金主财","远":"志存高远",
+  "丰":"五谷丰登","宇":"气宇轩昂","力":"强劲有力","峰":"登峰造极","达":"四通八达","源":"财源广进","昌":"繁荣昌盛",
+  "通":"贸易畅通","瑞":"祥瑞吉庆","博":"博采众长","业":"基业长青",
+  "欧":"对接欧美","纽":"枢纽链接","凯":"凯旋而归","迈":"迈向高端","星":"璀璨之星","威":"威望卓著","卓":"卓尔不凡",
+  "领":"引领行业","美":"美好品质","锐":"锐意进取","驰":"驰骋市场","顿":"稳健有力","耀":"光耀夺目","越":"超越自我",
+  "创":"创新创造","域":"开疆拓域","诺":"一诺千金","航":"扬帆远航","洲":"通达五洲","睿":"睿智决断",
+  "优":"优选品质","简":"简约高效","益":"互利共益","好":"好评如潮","一":"始终如一","乐":"合作愉快","捷":"快捷高效",
+  "顺":"顺风顺水","佳":"上佳之选","享":"共享共赢","百":"百里挑一","易":"轻松易得","新":"焕然一新","真":"货真价实",
+  "知":"知名可信","品":"品质背书","淘":"乐于淘选","购":"采购无忧","赞":"广受称赞","选":"优中优选",
+  "智":"智慧驱动","芯":"核心技术","数":"数字赋能","极":"极致体验","量":"量子领先","科":"科技创新","云":"云端互联",
+  "网":"互联互通","联":"万物互联","翼":"如虎添翼","启":"开启未来","维":"多维拓展","动":"动能十足","客":"极客精神",
+  "核":"核心引擎","擎":"强劲引擎","子":"灵动精微","讯":"资讯通达","谷":"创新生态","界":"突破边界",
+  "福":"福气满盈","金":"金玉满堂","祥":"吉祥如意","旺":"生意兴旺","隆":"生意隆昌","裕":"富裕充足","吉":"大吉大利",
+  "和":"和气生财","禾":"五谷丰登","兴":"兴旺发达","康":"安康顺遂","缘":"广结善缘","禄":"福禄双全",
+  "青":"青春活力","绿":"绿色环保","清":"清新纯净","本":"返璞归真","沐":"沐光而生","碧":"碧水青山","原":"天然原色",
+  "纯":"纯粹品质","木":"草木生长","澜":"碧波壮阔","沁":"沁人心脾","翠":"苍翠欲滴","润":"温润如玉","春":"生机盎然",
+  "川":"百川归海","然":"浑然天成","林":"枝繁叶茂","风":"和风细雨","野":"广袤原野","扬":"扬帆起航","兮":"古韵悠然",
+  "溪":"清溪潺潺","叶":"绿叶成荫","泽":"恩泽绵长","森":"林海森森"
+};
+
+/* ---------- 行业后缀 ---------- */
+const HANGYE = {
+  "美甲":"美容用品","美容":"美容科技","化妆":"化妆品","五金":"五金工具","工具":"工具制造","户外":"户外用品",
+  "服装":"服饰","纺织":"纺织品","电子":"电子科技","机械":"机械设备","家居":"家居用品","塑料":"塑料制品",
+  "包装":"包装材料","汽配":"汽车配件","汽车":"汽车配件","箱包":"箱包","玩具":"玩具","建材":"建材",
+  "板材":"新材料","食品":"食品","机器人":"智能科技","传感":"智能科技","充气":"户外用品","皮划艇":"户外用品",
+  "灯":"照明科技","照明":"照明科技","家具":"家具","鞋":"鞋业","珠宝":"珠宝","饰品":"饰品","医疗":"医疗器械"
+};
+
+/* ---------- 交互 ---------- */
+function bindChips(id, multi){
+  document.querySelectorAll('#'+id+' .chip').forEach(c=>{
+    c.addEventListener('click',()=>{
+      if(!multi){ document.querySelectorAll('#'+id+' .chip').forEach(x=>x.classList.remove('on')); }
+      c.classList.toggle('on');
+    });
+  });
+}
+bindChips('marketChips', false);
+bindChips('styleChips', true);
+function picked(id){ return [...document.querySelectorAll('#'+id+' .chip.on')].map(c=>c.dataset.v); }
+
+/* ---------- 工具 ---------- */
+function matchHangye(ind){ for(const k in HANGYE){ if(ind.includes(k)) return HANGYE[k]; } return "贸易"; }
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* 全局状态:已展示字号去重 + 当前需求快照 */
+let STATE = { used:new Set(), ctx:null };
+
+/* 根据风格构建全部候选字号池 */
+function buildPool(styleList, keyword){
+  const set = new Set();
+  styleList.forEach(s=>{
+    const b = BANK[s]; if(!b) return;
+    b.pre.forEach(p=> b.suf.forEach(q=>{ if(p!==q) set.add(p+q); }));
+  });
+  let arr = [...set];
+  // 关键词优先:含关键词单字的排前面
+  if(keyword){
+    const kw = keyword.slice(0,1);
+    // 额外用关键词字 + 各风格后字组合,提升命中
+    styleList.forEach(s=>{ (BANK[s]?.suf||[]).forEach(q=>{ if(kw!==q) arr.push(kw+q); }); });
+    arr = [...new Set(arr)];
+    arr.sort((a,b)=> (b.includes(kw)?1:0) - (a.includes(kw)?1:0));
+    const head = arr.filter(z=>z.includes(kw));
+    const tail = shuffle(arr.filter(z=>!z.includes(kw)));
+    return head.concat(tail);
+  }
+  return shuffle(arr);
+}
+
+function meaningOf(z, styleList){
+  const c1=z[0], c2=z[1];
+  const m1=CHAR_MEAN[c1], m2=CHAR_MEAN[c2];
+  if(m1&&m2) return m1+" · "+m2;
+  if(m1) return m1+",朗朗上口";
+  if(m2) return m2+",便于记忆";
+  return (styleList[0]||"品牌")+"风格,简洁好记";
+}
+
+/* ---------- 生成 ---------- */
+function generate(reset){
+  const industry = document.getElementById('industry').value.trim();
+  const region = document.getElementById('region').value.trim();
+  const keyword = document.getElementById('keyword').value.trim();
+  const market = picked('marketChips')[0] || '全球';
+  const styles = picked('styleChips');
+  const styleList = styles.length ? styles : ['大气','国际'];
+
+  if(!industry){ alert('请先填写主营行业/产品'); return; }
+
+  // 需求变化则重置去重池
+  const ctxKey = [industry,region,keyword,market,styleList.join('')].join('|');
+  if(reset || !STATE.ctx || STATE.ctx!==ctxKey){ STATE.used = new Set(); STATE.ctx = ctxKey; }
+
+  const hangye = matchHangye(industry);
+  const pool = buildPool(styleList, keyword);
+  const fresh = pool.filter(z=> !STATE.used.has(z));
+
+  if(fresh.length===0){
+    alert('当前风格下的字号已全部展示完毕~\n可勾选更多风格,或修改关键词再生成。');
+    return;
+  }
+  const batch = fresh.slice(0,50);
+  batch.forEach(z=> STATE.used.add(z));
+
+  const cards = batch.map(z=>{
+    const score = 80 + Math.floor(Math.random()*18); // 80-97
+    return { z, full:(region||'')+z+hangye+'有限公司', mean:meaningOf(z,styleList), score };
+  }).sort((a,b)=>b.score-a.score);
+
+  render({industry,region,market,styleList,keyword,hangye}, cards, fresh.length>50);
+}
+
+function buildAnalysis(c){
+  const mktNote = {
+    欧美:"欧美买家重专业与信任,字号宜稳重大气,避免歧义谐音",
+    中东:"中东市场看重实力感,字号偏大气厚重,规避文化敏感字",
+    东南亚:"东南亚关系导向,字号宜亲和好记,利于口碑传播",
+    南美:"南美偏热情友好的品牌调性,字号顺口即可",
+    非洲:"非洲注重可靠供应,字号突出稳定、实力",
+    全球:"面向全球多市场,字号求简洁、易读、寓意正面"
+  }[c.market] || "面向全球,字号求简洁易读、寓意正面";
+  return [
+    `<b>命名结构:</b>完整公司名 =「${c.region?esc(c.region):'行政区划'} + <b style="color:#ffb088">字号</b> + ${esc(c.hangye)} + 有限公司」,下方仅生成可自由发挥的<b>字号</b>部分。`,
+    `<b>目标市场(${esc(c.market)}):</b>${mktNote}。`,
+    `<b>风格:</b>已采纳「${c.styleList.join(' / ')}」,字号统一 2 字,规避生僻字以提高核名通过率。`,
+    `<b>核名建议:</b>同一行政区划内字号不可与同行业企业重名。先用每个字号右侧「查重」按钮排除已注册的,再挑 3-5 个排序提交,通过率更高。`
+  ];
+}
+
+/* ---------- 查重 ---------- */
+function checkURL(full, z, region){
+  // 路线A:跳转第三方/官方搜索,客户直接看同名企业
+  const key = encodeURIComponent((region||'') + z);
+  return "https://www.qcc.com/web/search?key=" + key;
+}
+function gsxtURL(){ return "https://www.gsxt.gov.cn/corp-query-homepage.html"; }
+
+/* ---------- 渲染 ---------- */
+function render(c, cards, hasMore){
+  const r = document.getElementById('result');
+  let html = '';
+  html += '<div class="analysis"><h3>📋 需求分析与命名策略</h3>'
+        + buildAnalysis(c).map(p=>'<p>'+p+'</p>').join('') + '</div>';
+
+  html += '<div class="checkNote">🔎 <b>可注册性查重</b>:点字号下方「查重」跳转 <a href="https://www.qcc.com" target="_blank" rel="noopener">企查查</a> 搜同地区同名企业;权威核名以 <a href="'+gsxtURL()+'" target="_blank" rel="noopener">国家企业信用信息公示系统</a> 与当地市监局申报结果为准。</div>';
+
+  html += '<div class="secTitle"><b>推荐字号</b><span class="counter">本批 '+cards.length+' 个 · 已展示 '+STATE.used.size+' 个</span></div>';
+
+  html += '<div class="grid">' + cards.map(c2=>`
+    <div class="zCard">
+      <p class="z">${esc(c2.z)}</p>
+      <p class="full">${esc(c2.full)}</p>
+      <p class="mean">${esc(c2.mean)}</p>
+      <div class="ops">
+        <span class="miniBtn" onclick="copyName(this,'${c2.z}')">复制</span>
+        <a class="miniBtn chk" href="${checkURL(c2.full,c2.z,c.region)}" target="_blank" rel="noopener">查重</a>
+        <span class="score">${c2.score}</span>
+      </div>
+    </div>`).join('') + '</div>';
+
+  html += '<button class="btn ghost" id="regenBtn">🔄 换一批字号(不重复)</button>';
+  html += '<button class="btn ghost" onclick="window.scrollTo({top:0,behavior:\'smooth\'})">⬆ 返回修改需求</button>';
+  r.innerHTML = html;
+  document.getElementById('regenBtn').addEventListener('click', ()=>generate(false));
+  document.querySelector('.analysis').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function copyName(btn, text){
+  const done=()=>{const o=btn.textContent;btn.textContent='已复制✓';btn.style.color='#3ecf8e';setTimeout(()=>{btn.textContent=o;btn.style.color='';},1200);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(done).catch(()=>fallbackCopy(text,done));
+  }else{fallbackCopy(text,done);}
+}
+function fallbackCopy(text,cb){
+  const t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';
+  document.body.appendChild(t);t.select();try{document.execCommand('copy');cb&&cb();}catch(e){}document.body.removeChild(t);
+}
+
+document.getElementById('genBtn').addEventListener('click', ()=>generate(true));
+</script>
+<footer>
+  公司字号起名助手 · 纯本地运行,数据不上传<br>
+  字号建议仅供参考,注册前请以当地工商核名结果为准
+</footer>
+</body>
+</html>
