@@ -114,7 +114,15 @@
       </div>
     </div>
     <div class="field">
-      <label>⑤ 希望体现的关键词 <span class="opt">选填,如:姓氏「王」、品质…</span></label>
+      <label>⑤ 字号字数 <span class="opt">单选,默认 2 字</span></label>
+      <div class="chips" id="lenChips">
+        <span class="chip on" data-v="2">2 字</span>
+        <span class="chip" data-v="3">3 字</span>
+        <span class="chip" data-v="4">4 字</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>⑥ 希望体现的关键词 <span class="opt">选填,如:姓氏「王」、品质…</span></label>
       <input type="text" id="keyword" placeholder="如:王、瑞、品质…(优先出含此字的字号)">
     </div>
     <button class="btn" id="genBtn">✨ 生成 50 个字号</button>
@@ -196,6 +204,7 @@ function bindChips(id, multi){
 }
 bindChips('marketChips', false);
 bindChips('styleChips', true);
+bindChips('lenChips', false);
 function picked(id){ return [...document.querySelectorAll('#'+id+' .chip.on')].map(c=>c.dataset.v); }
 
 /* ---------- 工具 ---------- */
@@ -206,22 +215,52 @@ function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.rando
 /* 全局状态:已展示字号去重 + 当前需求快照 */
 let STATE = { used:new Set(), ctx:null };
 
-/* 根据风格构建全部候选字号池 */
-function buildPool(styleList, keyword){
-  const set = new Set();
+/* 根据风格 + 字数构建全部候选字号池 */
+function buildPool(styleList, keyword, len){
+  len = len || 2;
+  // 汇总所选风格的前字、后字池
+  const preSet = new Set(), sufSet = new Set();
   styleList.forEach(s=>{
     const b = BANK[s]; if(!b) return;
-    b.pre.forEach(p=> b.suf.forEach(q=>{ if(p!==q) set.add(p+q); }));
+    b.pre.forEach(p=>preSet.add(p));
+    b.suf.forEach(q=>sufSet.add(q));
   });
+  const pres = [...preSet], sufs = [...sufSet];
+  const allChars = [...new Set([...pres, ...sufs])];
+  const uniq = z => new Set(z.split('')).size === z.length; // 全字不重复
+
+  const set = new Set();
+  const CAP = 4000; // 池上限,避免组合爆炸
+  const tryAdd = z => { if(z && uniq(z)) set.add(z); };
+
+  if(len === 2){
+    pres.forEach(p=> sufs.forEach(q=> tryAdd(p+q)));
+  } else if(len === 3){
+    // 前字 + 后字 + 后字(常见三字字号:如 鸿运达、聚力源)
+    for(const p of pres){ for(const q of sufs){ for(const r of sufs){ if(set.size>CAP) break; tryAdd(p+q+r); } } }
+  } else { // 4 字:两段二字组合(如 鸿运盛达、聚力博远)
+    for(const p of pres){ for(const q of sufs){ for(const r of pres){ for(const s of sufs){
+      if(set.size>CAP) break;
+      tryAdd(p+q+r+s);
+    } if(set.size>CAP) break; } if(set.size>CAP) break; } }
+  }
+
   let arr = [...set];
-  // 关键词优先:含关键词单字的排前面
+
+  // 关键词优先:让关键词字作为首字额外组合,并把含关键词的排前
   if(keyword){
     const kw = keyword.slice(0,1);
-    // 额外用关键词字 + 各风格后字组合,提升命中
-    styleList.forEach(s=>{ (BANK[s]?.suf||[]).forEach(q=>{ if(kw!==q) arr.push(kw+q); }); });
-    arr = [...new Set(arr)];
-    arr.sort((a,b)=> (b.includes(kw)?1:0) - (a.includes(kw)?1:0));
-    const head = arr.filter(z=>z.includes(kw));
+    const extra = [];
+    if(len === 2){
+      sufs.forEach(q=> extra.push(kw+q));
+    } else if(len === 3){
+      sufs.forEach(q=> sufs.forEach(r=> extra.push(kw+q+r)));
+    } else {
+      sufs.forEach(q=> pres.forEach(r=> sufs.forEach(s=> extra.push(kw+q+r+s))));
+    }
+    extra.forEach(tryAdd);
+    arr = [...set];
+    const head = shuffle(arr.filter(z=>z.includes(kw)));
     const tail = shuffle(arr.filter(z=>!z.includes(kw)));
     return head.concat(tail);
   }
@@ -229,11 +268,10 @@ function buildPool(styleList, keyword){
 }
 
 function meaningOf(z, styleList){
-  const c1=z[0], c2=z[1];
-  const m1=CHAR_MEAN[c1], m2=CHAR_MEAN[c2];
-  if(m1&&m2) return m1+" · "+m2;
-  if(m1) return m1+",朗朗上口";
-  if(m2) return m2+",便于记忆";
+  const chars = z.split('');
+  const metas = chars.map(c=> CHAR_MEAN[c]).filter(Boolean);
+  if(metas.length >= 2) return metas[0] + " · " + metas[metas.length-1];
+  if(metas.length === 1) return metas[0] + ",朗朗上口";
   return (styleList[0]||"品牌")+"风格,简洁好记";
 }
 
@@ -245,15 +283,16 @@ function generate(reset){
   const market = picked('marketChips')[0] || '全球';
   const styles = picked('styleChips');
   const styleList = styles.length ? styles : ['大气','国际'];
+  const len = parseInt(picked('lenChips')[0] || '2', 10);
 
   if(!industry){ alert('请先填写主营行业/产品'); return; }
 
   // 需求变化则重置去重池
-  const ctxKey = [industry,region,keyword,market,styleList.join('')].join('|');
+  const ctxKey = [industry,region,keyword,market,styleList.join(''),len].join('|');
   if(reset || !STATE.ctx || STATE.ctx!==ctxKey){ STATE.used = new Set(); STATE.ctx = ctxKey; }
 
   const hangye = matchHangye(industry);
-  const pool = buildPool(styleList, keyword);
+  const pool = buildPool(styleList, keyword, len);
   const fresh = pool.filter(z=> !STATE.used.has(z));
 
   if(fresh.length===0){
@@ -268,7 +307,7 @@ function generate(reset){
     return { z, full:(region||'')+z+hangye+'有限公司', mean:meaningOf(z,styleList), score };
   }).sort((a,b)=>b.score-a.score);
 
-  render({industry,region,market,styleList,keyword,hangye}, cards, fresh.length>50);
+  render({industry,region,market,styleList,keyword,hangye,len}, cards, fresh.length>50);
 }
 
 function buildAnalysis(c){
@@ -283,7 +322,7 @@ function buildAnalysis(c){
   return [
     `<b>命名结构:</b>完整公司名 =「${c.region?esc(c.region):'行政区划'} + <b style="color:#ffb088">字号</b> + ${esc(c.hangye)} + 有限公司」,下方仅生成可自由发挥的<b>字号</b>部分。`,
     `<b>目标市场(${esc(c.market)}):</b>${mktNote}。`,
-    `<b>风格:</b>已采纳「${c.styleList.join(' / ')}」,字号统一 2 字,规避生僻字以提高核名通过率。`,
+    `<b>风格:</b>已采纳「${c.styleList.join(' / ')}」,字号统一 ${c.len||2} 字,规避生僻字以提高核名通过率。`,
     `<b>核名建议:</b>同一行政区划内字号不可与同行业企业重名。先用每个字号右侧「查重」按钮排除已注册的,再挑 3-5 个排序提交,通过率更高。`
   ];
 }
